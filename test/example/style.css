@@ -1,0 +1,27 @@
+.abc {
+  width: 200px;
+}
+
+.ant-message {
+  width: 100px;
+}
+
+.warp .ant-message {
+  width: 200px;
+}
+
+.ant-message .ant-message-title {
+  width: 300px;
+}
+
+.ant-modal {
+  width: 100px;
+}
+
+.ant-modal-title {
+  width: 300px;
+}
+
+.wrap .wrap2 .wrap3 .ant-modal {
+  width: 400px;
+}
