@@ -10,7 +10,9 @@
     "noImplicitReturns": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "declaration": true,
+    "declarationDir": "./lib"
   },
   "include": [
     "src/**/*"
