@@ -1,17 +1,25 @@
 import { Plugin, Compiler } from 'webpack';
 
 interface IOption {
-  char: string;
+  prefix: string;
   ignore?: string | string[];
 }
 
+interface IMediaCss {
+  name: string;
+  content: string;
+  css: string[];
+}
+
 export default class CssReplace implements Plugin {
-  char: string;
+  prefix: string;
 
   ignore: string[] = [];
 
+  mediaCss: IMediaCss[] = [];
+
   constructor(option: IOption) {
-    this.char = option.char;
+    this.prefix = option.prefix;
     if (option.ignore) {
       if (typeof option.ignore === 'string') {
         this.ignore = [option.ignore];
@@ -29,31 +37,18 @@ export default class CssReplace implements Plugin {
           if (/\.css$/.test(filename)) {
             let source: string = compilation.assets[filename].source();
 
-            const css: string[] = [];
+            // 查找需要忽略的样式名
+            let css: string[] = [];
+            source = this.filterMediaCss(source);
             this.ignore.forEach((item) => {
-              const reg = new RegExp(`\.${item}[\\s\\S]*?\{[\\s\\S]+?\}`, 'g');
-              while (true) {
-                const res = reg.exec(source);
-                if (!res) {
-                  break;
-                }
-                const str = res[0];
-                const { index } = res;
-                let s = '';
-                for (let i = index - 1; i > -1; i--) {
-                  if (source[i] === '}' || source[i] === '{') {
-                    break;
-                  } else {
-                    s = source[i] + s;
-                  }
-                }
-                css.push(s + str);
-              }
+              css = css.concat(this.getIgnoreCss(source, item));
+              this.copyMediaCss(item);
             });
 
-            source = source.replace(/\.ant-/g, `.${this.char}-`);
+            // 把ant替换掉
+            source = source.replace(/\.ant-/g, `.${this.prefix}-`);
 
-            const fileContent = source + css.join('');
+            const fileContent = source + css.join('') + this.getMediaCss();
 
             compilation.assets[filename] = {
               // 返回文件内容
@@ -66,5 +61,98 @@ export default class CssReplace implements Plugin {
       });
       callback();
     });
+  }
+
+  /**
+   * 过滤出媒体查询样式，单独处理
+   */
+  filterMediaCss(source: string): string {
+    const reg = new RegExp('(\@media.*?){', 'g');
+    const sign = [];
+    while (true) {
+      const res = reg.exec(source);
+      if (!res) {
+        break;
+      }
+      let s = '';
+      let index = res[0].length + res.index;
+      const stack = ['{'];
+      while (stack.length > 0) {
+        if (source[index] === '{') {
+          stack.push(source[index]);
+        } else if (source[index] === '}') {
+          stack.pop();
+        }
+        if (stack.length > 0) {
+          s += source[index];
+        }
+        index++;
+      }
+      if (new RegExp(`\.lyt-(${this.ignore.join('|')})`).test(s)) {
+        const mc: IMediaCss = {
+          name: '',
+          content: '',
+          css: [],
+        };
+        mc.name = res[1];
+        mc.content = s;
+        this.mediaCss.push(mc);
+        sign.push([res.index, index]);
+      }
+    }
+    for (let i = sign.length - 1; i >= 0; i--) {
+      source = source.substring(0, sign[i][0]) + source.substring(sign[i][1], source.length + 1);
+    }
+    return source;
+  }
+
+  /**
+   * 复制@media 样式
+   */
+  copyMediaCss(ignore: string) {
+    this.mediaCss.forEach((item) => {
+      const css = this.getIgnoreCss(item.content, ignore);
+      item.content = item.content.replace(/\.ant-/g, `.${this.prefix}-`);
+      item.css = item.css.concat(css);
+    });
+  }
+
+  /**
+   * 获取@media 样式
+   */
+  getMediaCss() {
+    let s = '';
+    this.mediaCss.forEach((item) => {
+      s += `${item.name}{${item.content} ${item.css.join(' ')}}`;
+    });
+    return s;
+  }
+
+  /**
+   * 获取忽略的样式
+   */
+  getIgnoreCss(source: string, ignore: string): string[] {
+    const prefix = `${this.prefix}-${ignore}`;
+    const antPrefix = `ant-${ignore}`;
+    const reg = new RegExp(`\.(${prefix}|${antPrefix})[\\s\\S]*?\{[\\s\\S]+?\}`, 'g');
+    const css: string[] = [];
+    while (true) {
+      const res = reg.exec(source);
+      if (!res) {
+        break;
+      }
+      const str = res[0];
+      const { index } = res;
+      let s = '';
+      for (let i = index - 1; i > -1; i--) {
+        if (source[i] === '}' || source[i] === '{') {
+          break;
+        } else {
+          s = source[i] + s;
+        }
+      }
+      css.push((s + str).replace(new RegExp(this.prefix, 'g'), 'ant'));
+    }
+    return css;
   }
 }
