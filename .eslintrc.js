@@ -12,7 +12,8 @@ module.exports = {
         'no-plusplus': 0,
         'no-constant-condition': 0,
         'import/no-unresolved': 0,
-        'import/extensions': 0
+        'import/extensions': 0,
+        'prefer-destructuring': 0
     },
     parser: '@typescript-eslint/parser',
 };
