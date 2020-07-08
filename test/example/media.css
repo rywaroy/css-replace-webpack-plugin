@@ -1,0 +1,31 @@
+@media screen and (max-width: 1200px) {
+  .lyt-message-media-title {
+    width: 6px;
+  }
+
+  /* @media 中 手动修改的ant样式 */
+  .wrap .ant-message-media {
+    width: 7px;
+  }
+
+  /* @media 中 手动修改的lyt样式 */
+  .wrap2 .lyt-message-media {
+    width: 8px;
+  }
+
+  /* 无关样式 */
+  .address {
+    width: 9px;
+  }
+}
+
+@media screen and (max-width: 1300px) {
+  /* 无关样式 */
+  .address {
+    width: 10px;
+  }
+
+  .lyt-xxx {
+    width: 11px;
+  }
+}

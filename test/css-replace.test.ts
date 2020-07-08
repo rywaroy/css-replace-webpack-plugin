@@ -25,18 +25,17 @@ describe('测试', () => {
       },
       plugins: [
         new MiniCssExtractPlugin(),
-        new CssReplaceWebpackPlugin({ char: 'lyt', ignore: ['ant-message', 'ant-modal'] }),
+        new CssReplaceWebpackPlugin({ prefix: 'lyt', ignore: ['message'] }),
       ],
     }, () => {
       const context = fs.readFileSync(path.resolve(__dirname, './example/dist/index.css'), 'utf-8');
-      expect(context).toContain('.lyt-message');
-      expect(context).toContain('.lyt-modal');
+      expect(context).toContain('.ant-message');
       expect(context).toContain('.ant-message .ant-message-title');
-      expect(context).toContain('.lyt-message .lyt-message-title');
       expect(context).toContain('.warp .ant-message');
-      expect(context).toContain('.warp .lyt-message');
-      expect(context).toContain('.wrap .wrap2 .wrap3 .lyt-modal');
-      expect(context).toContain('.wrap .wrap2 .wrap3 .ant-modal');
+      expect(context).toContain('.warp2 .lyt-message');
+      expect(context).toContain('.ant-message-media-title');
+      expect(context).toContain('.wrap .lyt-message-media');
+      expect(context).toContain('.wrap2 .ant-message-media');
       done();
     });
   });

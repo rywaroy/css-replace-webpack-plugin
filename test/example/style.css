@@ -1,27 +1,24 @@
+/* 无关样式 */
 .abc {
-  width: 200px;
+  width: 1px;
 }
 
-.ant-message {
-  width: 100px;
+/* antd样式 */
+.lyt-message {
+  width: 2px;
 }
 
-.warp .ant-message {
-  width: 200px;
+/* antd样式 */
+.lyt-message .lyt-message-title {
+  width: 3px;
 }
 
-.ant-message .ant-message-title {
-  width: 300px;
+/* 手动修改的lyt样式 */
+.warp .lyt-message {
+  width: 4px;
 }
 
-.ant-modal {
-  width: 100px;
-}
-
-.ant-modal-title {
-  width: 300px;
-}
-
-.wrap .wrap2 .wrap3 .ant-modal {
-  width: 400px;
+/* 手动修改的ant样式 */
+.warp2 .ant-message {
+  width: 5px;
 }
